@@ -7,7 +7,6 @@ type Tokens = Token[];
 /**
  * Utilities
  */
-const clone = require('clone-deep');
 const isObj = require('is-plain-object');
 const isArray = (val: any): val is any[] => Array.isArray(val);
 const isString = (val: any): val is string => typeof val === 'string';
@@ -215,7 +214,9 @@ export const get = (data: any, path: DotKey, value: any | undefined = undefined,
 export const set = (data: any, path: DotKey, value: any): any => {
   if (!path || !isString(path)) return data;
 
-  let _data = clone(data);
+  // NOTE: this is not a deep clone, so there might be side-effects
+  // deep clone ends up wiping out File() objects (converts them to normal objects)
+  let _data = { ...data };
 
   if (!hasToken(path)) {
     _data[path] = value;
@@ -284,7 +285,9 @@ export const remove = (data: any, path: DotKey): any => {
     return data;
   }
 
-  let _data = clone(data);
+  // NOTE: this is not a deep clone, so there might be side-effects
+  // deep clone ends up wiping out File() objects (converts them to normal objects)
+  let _data = { ...data };
 
   if (!hasToken(path) && path !== '*') {
     return simpleRemove(_data, path);
